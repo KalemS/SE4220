@@ -189,6 +189,19 @@ def view_photo(photoID):
                            photo=items[0], tags=tags, exifdata=exifdata)
 
 
+@app.route('/download/<int:photoID>', methods=['GET'])
+@login_required
+def download_photo(photoID):
+    user_id = get_current_user()
+    response = table.scan(
+        FilterExpression=Attr('PhotoID').eq(str(photoID)) & Attr('UserID').eq(user_id)
+    )
+    items = response['Items']
+    if not items:
+        abort(404)
+    return redirect(items[0]['URL'])
+
+
 @app.route('/search', methods=['GET'])
 @login_required
 def search_page():
